@@ -3,3 +3,6 @@ ScalarFlow is neural network engine for scalar valued inputs, named as a spinoff
 
 ### Why I made it
 This project is the outcome of me dipping my toes into the work of generative AI and neural networks. It gave me an intuitive understanding of what a neural network actually is, how it works, and how to optimize one (via backpropagation). Turns out that at least in my case, its just some simple math.
+
+
+__This is still a work in progress!__
