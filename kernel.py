@@ -22,10 +22,22 @@ class Scalar :
             self.grad += out.grad
             other.grad += out.grad
         out._backward = _backward
-        return out;
+        return out
+
+    def __mul__(self, other):
+        other = other if isinstance(other, Scalar) else Scalar(other)
+        out = Scalar(self.data * other.data, (self, other))
+
+        def _backward():
+            self.grad += other.data * out.grad
+            other.grad += self.data * out.grad
+        out._backward = _backward
+
+        return out    
+
 
     def __pow__(self, other):
-        assert isinstance(other, (int, float)), "only supporting int/float powers for now"
+        assert isinstance(other, (int, float))
         out = Scalar(self.data**other, (self,))
 
         def _backward():
@@ -35,14 +47,14 @@ class Scalar :
         return out
     
     def log(self):
-        out = Scalar(math.log10(self.data), (self,))
+        out = Scalar(math.log10(self.data + 1e-7), (self,))
 
         def _backward():
-            self.grad = (1/(self*math.log(10))) * out.grad
+            self.grad = (1/((self.data + 1e-7)*math.log(10))) * out.grad
         out._backward = _backward
     
         return out
-
+    
     def __neg__(self): # -self
         return self * -1
 
@@ -64,23 +76,20 @@ class Scalar :
     def __rtruediv__(self, other): # other / self
         return other * self**-1
 
-    
-    def __mul__(self, other):
-        other = other if isinstance(other, Scalar) else Scalar(other)
-        out = Scalar(self.data * other.data, (self, other))
-
-        def _backward():
-            self.grad += other.data * out.grad
-            other.grad += self.data * out.grad
-        out._backward = _backward
-
-        return out    
-
     def tanh(self):
         out = Scalar(math.tanh(self.data), (self,))
 
         def _backward():
             self.grad += (1-math.tanh(self.data)**2) * out.grad
+        out._backward = _backward
+        return out
+    
+    def sigmoid(self):
+        result = 1/(1 + math.exp(self.data))
+        out = Scalar(result, (self,))
+        
+        def _backward():
+            self.grad += (result*(1-result)) * out.grad
         out._backward = _backward
         return out
     
@@ -119,7 +128,7 @@ class Neuron:
         activation = sum((wi*xi for wi, xi in zip(self.weights, x)), self.bias)
         
         #Squash the output so that it is between 0 and 1.
-        return activation.tanh()
+        return activation.sigmoid()
     
     def parameters(self):
         return self.weights + [self.bias]

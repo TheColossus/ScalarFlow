@@ -6,7 +6,7 @@ def trace(root):
     def build(v):
         if v not in nodes:
             nodes.add(v)
-            for child in v._prev:
+            for child in v.prev:
                 edges.add((child, v))
                 build(child)
     build(root)
