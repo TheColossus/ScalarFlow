@@ -33,6 +33,15 @@ class Scalar :
         out._backward = _backward
 
         return out
+    
+    def log(self):
+        out = Scalar(math.log10(self.data), (self,))
+
+        def backward():
+            self.grad = (1/(self*math.log(10))) * out.grad
+        out.backward = backward
+    
+        return out
 
     def __neg__(self): # -self
         return self * -1
