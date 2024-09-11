@@ -123,7 +123,7 @@ class Layer:
 
     def __call__(self, x):
         Layer = [n(x) for n in self.neurons]
-        return Layer
+        return Layer[0] if len(Layer) == 1 else Layer
     
     def parameters(self):
         params = []
