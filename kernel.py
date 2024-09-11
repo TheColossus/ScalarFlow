@@ -12,16 +12,16 @@ class Scalar :
         self.prev = set(children)
 
         #A function that computes the chain rule during backpropagation
-        self.backward = lambda : None
+        self._backward = lambda : None
 
     def __add__(self, other):
         other = other if isinstance(other, Scalar) else Scalar(other)
         out = Scalar(self.data + other.data, (self, other))
 
-        def backward():
+        def _backward():
             self.grad += out.grad
             other.grad += out.grad
-        out.backward = backward
+        out._backward = _backward
         return out;
 
     def __pow__(self, other):
@@ -37,9 +37,9 @@ class Scalar :
     def log(self):
         out = Scalar(math.log10(self.data), (self,))
 
-        def backward():
+        def _backward():
             self.grad = (1/(self*math.log(10))) * out.grad
-        out.backward = backward
+        out._backward = _backward
     
         return out
 
@@ -69,19 +69,19 @@ class Scalar :
         other = other if isinstance(other, Scalar) else Scalar(other)
         out = Scalar(self.data * other.data, (self, other))
 
-        def backward():
+        def _backward():
             self.grad += other.data * out.grad
             other.grad += self.data * out.grad
-        out.backward = backward
+        out._backward = _backward
 
         return out    
 
     def tanh(self):
         out = Scalar(math.tanh(self.data), (self,))
 
-        def backward():
-            self.grad = (1-math.tanh(self.data)**2) * out.grad
-        out.backward = backward
+        def _backward():
+            self.grad += (1-math.tanh(self.data)**2) * out.grad
+        out._backward = _backward
         return out
     
     def backward(self):
@@ -102,7 +102,7 @@ class Scalar :
 
         #You need to start backpropagation at the output node, so reverse the topological sort then go backwards
         for node in reversed(topo):
-            node.backward()
+            node._backward()
 
 
     def __repr__(self):
