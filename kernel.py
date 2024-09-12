@@ -3,13 +3,13 @@ import random
 
 class Scalar :
 
-    def __init__(self, data, children=()):
+    def __init__(self, data, parents=()):
         #Every Scalar has a value and a corresponding gradient
         self.data = data
         self.grad = 0.0
 
         #Store the parents of each scalar in an unordered set
-        self.prev = set(children)
+        self.prev = set(parents)
 
         #A function that computes the chain rule during backpropagation
         self._backward = lambda : None
