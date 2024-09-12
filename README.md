@@ -39,7 +39,7 @@ x.parameters() #Output: [Scalar(data=-0.04005001083775157, gradient=0.0), Scalar
 ```
 - Notice how the parameters are also scalars. This may be important if you decide to implement your own squashing function!
 
-- Currently this library supports two squashing functions, tanh and sigmoid, ReLU might be coming soon :)
+- Currently this library supports two squashing functions, tanh, sigmoid, and ReLU
 
 - Currently you will have to build your own loss function. In the example I used binary cross entropy, however the flexibility with the operations should allow you to implement whatever you want. Maybe in the future I'll make it a part of the library.
 
