@@ -44,5 +44,3 @@ x.parameters() #Output: [Scalar(data=-0.04005001083775157, gradient=0.0), Scalar
 - Currently you will have to build your own loss function. In the example I used binary cross entropy, however the flexibility with the operations should allow you to implement whatever you want. Maybe in the future I'll make it a part of the library.
 
 Thanks for taking a look at my project! 
-
-## ___THE EXAMPLE IS CURRENTLY INCOMPLETE!___
