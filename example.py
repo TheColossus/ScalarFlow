@@ -28,7 +28,7 @@ yTest = yTest.tolist()
 
 #Build the model
 #2 layer MLP with 13 dimensional inputs (The dataset has 13 input columns)
-model = MLP(13, [20, 20, 1])
+model = MLP(13, [10, 5, 1])
 
 #Define the loss function
 def BinaryCrossEntropy(yTrue, yPred):
@@ -48,15 +48,15 @@ for epoch in range(100):
 
     loss = BinaryCrossEntropy(yTrain, yPredicted)
 
-        #Backward pass
+    #Backward pass
     for p in model.parameters():
         p.grad = 0
-    
+
     loss.backward()
 
         #Update weights and biases
     for params in model.parameters():
-        params.data -= 0.001 * params.grad
+        params.data -= 0.0015 * params.grad
 
 #Test the model
 yPredictions = [model(x) for x in xTest]
@@ -67,7 +67,6 @@ yPredictionsClean = [x.data for x in yPredictions]
 #Push the data through a threshold to make it binary
 
 yPredictionsFinal = [0 if x < 0.5 else 1 for x in yPredictionsClean]
-print(yPredictionsFinal)
 
 cm = confusion_matrix(yTest, yPredictionsFinal)
 

@@ -93,6 +93,16 @@ class Scalar :
         out._backward = _backward
         return out
     
+    
+    def relu(self):
+        out = Scalar(0 if self.data < 0 else self.data, (self,))
+
+        def _backward():
+            self.grad += (out.data > 0) * out.grad
+        out._backward = _backward
+
+        return out
+    
     def backward(self):
         #Order the nodes from right to left via a topological sort done DFS style
         #Recursively start at the root node and go backwards, appending each node's children before itself, to ensure topological order
