@@ -1,5 +1,4 @@
 import math
-import random
 
 class Scalar :
 
@@ -47,14 +46,14 @@ class Scalar :
         return out
     
     def log(self):
-        out = Scalar(math.log10(self.data + 1e-7), (self,))
+        out = Scalar(math.log(self.data), (self,))
 
         def _backward():
-            self.grad = (1/((self.data + 1e-7)*math.log(10))) * out.grad
+            self.grad += (1 / self.data) * out.grad
         out._backward = _backward
-    
+
         return out
-    
+        
     def __neg__(self): # -self
         return self * -1
 
@@ -126,55 +125,3 @@ class Scalar :
 
     def __repr__(self):
         return f"Scalar(data={self.data}, gradient={self.grad})"
-    
-class Neuron:
-
-    def __init__(self, dimNeurons):
-        self.weights = [Scalar(random.uniform(-1,1)) for _ in range(dimNeurons)]
-        self.bias = Scalar(random.uniform(-1,1))
-
-    def __call__(self, x):
-        #Dot the inputs to the neuron with one another, and add a bias
-        activation = sum((wi*xi for wi, xi in zip(self.weights, x)), self.bias)
-        
-        #Squash the output so that it is between 0 and 1.
-        return activation.sigmoid()
-    
-    def parameters(self):
-        return self.weights + [self.bias]
-    
-class Layer:
-
-    def __init__(self, dimNeurons, numNeurons):
-        #Initialize a list of n-dimensional neurons where n = dimNeurons
-        self.neurons = [Neuron(dimNeurons) for _ in range(numNeurons)]
-
-    def __call__(self, x):
-        Layer = [n(x) for n in self.neurons]
-        return Layer[0] if len(Layer) == 1 else Layer
-    
-    def parameters(self):
-        params = []
-        for neuron in self.neurons:
-            ps = neuron.parameters()
-            params.extend(ps)
-        return params
-
-    
-class MLP:
-
-    def __init__(self, dimNeurons, numNeurons):
-        layerSize = [dimNeurons] + numNeurons
-        self.layers = [Layer(layerSize[i], layerSize[i+1]) for i in range(len(numNeurons))] 
-
-    def __call__(self, x):
-        for layer in self.layers:
-            x = layer(x)
-        return x
-        
-    def parameters(self):
-        params = []
-        for layer in self.layers:
-            ps = layer.parameters()
-            params.extend(ps)
-        return params

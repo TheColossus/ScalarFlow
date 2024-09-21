@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
-from kernel import MLP
+from engine import MLP, train_mlp
 
 #Input data
 #Replace the path to the csv as needed. If you keep it like this, ensure you run the program from the 'example' directory
@@ -28,35 +28,9 @@ yTest = yTest.tolist()
 
 #Build the model
 #2 layer MLP with 13 dimensional inputs (The dataset has 13 input columns)
-model = MLP(13, [10, 5, 1])
+model = MLP(13, [15, 15, 1])
 
-#Define the loss function
-def BinaryCrossEntropy(yTrue, yPred):
-    sum = 0
-    numTerms = 0
-    for i in range(len(yTrue)):
-        term0 = (1-yTrue[i]) * (1-yPred[i]).log()
-        term1 = yTrue[i] * yPred[i].log()
-
-        sum += (term0 + term1)
-        numTerms += 1
-    
-    return (-sum/numTerms)
-
-for epoch in range(100):
-    yPredicted = [model(x) for x in xTrain]
-
-    loss = BinaryCrossEntropy(yTrain, yPredicted)
-
-    #Backward pass
-    for p in model.parameters():
-        p.grad = 0
-
-    loss.backward()
-
-        #Update weights and biases
-    for params in model.parameters():
-        params.data -= 0.0015 * params.grad
+train_mlp(model, xTrain, yTrain, 64, 50, 0.00001)
 
 #Test the model
 yPredictions = [model(x) for x in xTest]
