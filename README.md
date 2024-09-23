@@ -4,7 +4,7 @@ ScalarFlow is neural network library for scalar valued inputs, named as a spinof
 
 ## Features of the library
 
--The 'Scalar' class: Create objects that store data and gradients of each neuron. Scalars have numerous methods that help with computation and automatically handles differentiation during backpropagation:
+-The 'Scalar' class in kernel.py: Create objects that store data and gradients of each neuron. Scalars have numerous methods that help with computation and automatically handles differentiation during backpropagation:
   - Addition, multiplication, subtraction, division, exponentiation (currently can only raise to integers and floats), logarithms (currently only natural log):
     ```
     x = Scalar(4)
@@ -41,6 +41,13 @@ x.parameters() #Output: [Scalar(data=-0.04005001083775157, gradient=0.0), Scalar
 
 - Currently this library supports two squashing functions, tanh, sigmoid, and ReLU
 
-- Currently you will have to build your own loss function. In the example I used binary cross entropy, however the flexibility with the operations should allow you to implement whatever you want. Maybe in the future I'll make it a part of the library.
+- Engine.py contains a train_mlp function (As well as the Neuron, Layer, and MLP classes), which accepts the following inputs:
+  1. model: The model you wish to train (of type MLP)
+  2. Inputs: Must be a native python array, unfortunately it doesn't support numpy arrays (yet)
+  3. Outputs: Same condition as inputs
+  4. Batching Size (__NEW__): You can batch your training data together, and weights will only update per batch as opposed to per sample.
+  5. Epochs: The number of times you want to adjust the weights.
+  6. Learning rate: The factor by which the weights are changed per epoch.
+  - train_mlp currently only supports binary cross entropy for loss functions, I'll add more as soon as I fix example.py, which currently sucks at learning unfortunately (any help would be appreciated!)
 
 Thanks for taking a look at my project! 
