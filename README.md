@@ -4,8 +4,8 @@ ScalarFlow is neural network library for scalar valued inputs, named as a spinof
 
 ## Features of the library
 
--The 'Scalar' class: Create objects that store data and gradients of each neuron. Scalars have numerous methods that help with computation and even backpropagation:
-  - Addition, multiplication, subtraction, division, exponentiation (currently can only raise to integers and floats), logarithms (currently only base 10):
+-The 'Scalar' class: Create objects that store data and gradients of each neuron. Scalars have numerous methods that help with computation and automatically handles differentiation during backpropagation:
+  - Addition, multiplication, subtraction, division, exponentiation (currently can only raise to integers and floats), logarithms (currently only natural log):
     ```
     x = Scalar(4)
     y = Scalar(5)
@@ -16,7 +16,7 @@ ScalarFlow is neural network library for scalar valued inputs, named as a spinof
     x**2 #Outputs Scalar(16.0)
     log(2 * y) #Outputs Scalar(1.0)
     ```
-  - That last example had an integer before the scalar, which will also work for each operation.
+  - That last example had an integer before the scalar, which will also work for each operation; order between scalar-integer or scalar-float computation does not matter.
   
   - Each scalar stores its 'parents', the nodes that it was born from via an operation.
     - Example:
