@@ -84,7 +84,13 @@ class Scalar :
         return out
     
     def sigmoid(self):
-        result = 1/(1 + math.exp(self.data))
+        if self.data < -500:  # Prevent underflow
+            result = 0.0
+        elif self.data > 500:  # Prevent overflow  
+         result = 1.0
+        else:
+            result = 1 / (1 + math.exp(-self.data))
+        
         out = Scalar(result, (self,))
         
         def _backward():

@@ -1,8 +1,9 @@
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix
-from engine import MLP, train_mlp
+from sklearn.metrics import confusion_matrix, accuracy_score
+from engine import MLP, train_mlp, mean_squared_error
+from kernel import Scalar
 
 #Input data
 #Replace the path to the csv as needed. If you keep it like this, ensure you run the program from the 'example' directory
@@ -26,14 +27,19 @@ yTrain = yTrain.tolist()
 xTest = xTest.tolist()
 yTest = yTest.tolist()
 
+xTrainScalars = [[Scalar(val) for val in row] for row in xTrain]
+yTrainScalars = [Scalar(val) for val in yTrain]
+xTestScalars = [[Scalar(val) for val in row] for row in xTest]
+
 #Build the model
 #2 layer MLP with 13 dimensional inputs (The dataset has 13 input columns)
-model = MLP(13, [15, 15, 1])
+model = MLP(13, [15, 15, 1], hidden_activation='relu', output_activation='sigmoid')
 
-train_mlp(model, xTrain, yTrain, 64, 50, 0.00001)
+print("Starting training...")
+train_mlp(model, xTrainScalars, yTrainScalars, batch_size=32, epochs=100, learning_rate=0.01, loss_fn=mean_squared_error)
 
 #Test the model
-yPredictions = [model(x) for x in xTest]
+yPredictions = [model(x) for x in xTestScalars]
 
 #Pull the data property out of each Scalar
 yPredictionsClean = [x.data for x in yPredictions]
@@ -43,12 +49,18 @@ yPredictionsClean = [x.data for x in yPredictions]
 yPredictionsFinal = [0 if x < 0.5 else 1 for x in yPredictionsClean]
 
 cm = confusion_matrix(yTest, yPredictionsFinal)
+accuracy = accuracy_score(yTest, yPredictionsFinal)
 
 TN, FP, FN, TP = confusion_matrix(yTest, yPredictionsFinal).ravel()
 
-print('True Positive(TP)  = ', TP)
-print('False Positive(FP) = ', FP)
-print('True Negative(TN)  = ', TN)
-print('False Negative(FN) = ', FN)
+print('\n=== RESULTS ===')
+print(f'Accuracy: {accuracy:.4f} ({accuracy*100:.2f}%)')
+print(f'True Positive(TP)  = {TP}')
+print(f'False Positive(FP) = {FP}')
+print(f'True Negative(TN)  = {TN}')
+print(f'False Negative(FN) = {FN}')
+
+print('\nConfusion Matrix:')
+print(cm)
 
 
