@@ -32,6 +32,7 @@ yTrainScalars = [Scalar(val) for val in yTrain]
 xTestScalars = [[Scalar(val) for val in row] for row in xTest]
 
 #Build the model
+#2 layer MLP with 13 dimensional inputs (The dataset has 13 input columns)
 model = MLP(13, [15, 15, 1], hidden_activation='relu', output_activation='sigmoid')
 
 print("Starting training...")

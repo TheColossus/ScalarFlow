@@ -68,7 +68,7 @@ def mean_squared_error(y_true, y_pred):
     diff = y_pred - y_true
     return diff * diff
 
-def train_mlp(model, X, y, batch_size, epochs, learning_rate, loss_fn=mean_squared_error, lr_decay_type='exponential', lr_decay_rate=0.95, lr_decay_step=10, lr_min=1e-6):
+def train_mlp(model, X, y, batch_size, epochs, learning_rate, loss_fn=mean_squared_error,lr_decay_type='exponential', lr_decay_rate=0.95, lr_decay_step=10, lr_min=1e-6):
     initial_lr = learning_rate
     for epoch in range(epochs):
         # Update learning rate based on decay strategy
