@@ -1,53 +1,68 @@
-# Overview
+# ScalarFlow
 
-ScalarFlow is neural network library for scalar valued inputs, named as a spinoff of TensorFlow, (Although the API is closer to PyTorch). It is heavily based off of [micrograd](https://github.com/karpathy/micrograd/blob/master/micrograd/) and I made it as a resource for myself to get familiar with some simpler ML concepts like backpropagation, loss, gradient descent, and evaluating the performance of models.
+ScalarFlow is a minimalist neural network library for scalar-valued inputs, inspired by TensorFlow and PyTorch. It is heavily based on [micrograd](https://github.com/karpathy/micrograd/) and was created as a learning tool to explore backpropagation, gradient descent, and model evaluation.  
 
-## Features of the library
+---
 
--The 'Scalar' class in kernel.py: Create objects that store data and gradients of each neuron. Scalars have numerous methods that help with computation and automatically handles differentiation during backpropagation:
-  - Addition, multiplication, subtraction, division, exponentiation (currently can only raise to integers and floats), logarithms (currently only natural log):
-    ```
-    x = Scalar(4)
-    y = Scalar(5)
-    x + y #Outputs Scalar(9.0)
-    x * y #Outputs Scalar(20.0)
-    x - y #Outputs Scalar(-1.0)
-    x / y #Outputs Scalar(0.8)
-    x**2 #Outputs Scalar(16.0)
-    log(2 * y) #Outputs Scalar(1.0)
-    ```
-  - That last example had an integer before the scalar, which will also work for each operation; order between scalar-integer or scalar-float computation does not matter.
-  
-  - Each scalar stores its 'parents', the nodes that it was born from via an operation.
-    - Example:
-      ```
-      x = Scalar(4)
-      y = Scalar(5)
-      z = x + y #z is a child of x and y
+## Features
 
-      z.prev #Output: {Scalar(data = 4.0, grad = 0.0), Scalar(data = 5.0, grad = 0.0)} 
-      ```
-- The 'backward()' method: Call this to perform backpropagation. THis can actually be called from anywhere, whether you choose a singular neuron or an entire model. if you call it on an MLP object, the root node will be the output neuron, otherwise it will be   the specified neuron. This will adjust the gradients of each neuron (Which is stored in a scalar as previously mentioned). See the example for some insight into its functionality. 
-      
-- Initializing multi layer perceptrons (MLPs) with multidimensional inputs with ease:
-  - Example: `model = MLP(13, [20, 20, 1])` initializes a model that accepts 13 inputs, and has 2 hidden layers of 20 neurons each.
+### Scalar class (`kernel.py`)
+Represents a scalar value with automatic gradient tracking for backpropagation. Supports:  
 
-- You can access the parameters of any singular neuron, an entire layer, or even the entire model by simply using the `parameters()` method:
+- Arithmetic: `+`, `-`, `*`, `/`, exponentiation (ints/floats)  
+- Natural logarithm: `log()`  
+- Keeps track of parent nodes for automatic differentiation  
+- `.backward()` to compute gradients  
+
+**Example:**  
 ```
-x = Neuron(2) #A neuron accepting a 2D input
-x.parameters() #Output: [Scalar(data=-0.04005001083775157, gradient=0.0), Scalar(data=-0.6467923074411892, gradient=0.0), Scalar(data=0.05844456602120592, gradient=0.0)] -> These are random numbers between 1 and negative 1, the first 2 are weights, and the last element is the bias.
+x = Scalar(4)
+y = Scalar(5)
+z = x + y         # Scalar(9.0)
+z.prev            # {Scalar(4.0), Scalar(5.0)}
+z.backward()      # computes gradients
 ```
-- Notice how the parameters are also scalars. This may be important if you decide to implement your own squashing function!
 
-- Currently this library supports two squashing functions, tanh, sigmoid, and ReLU
+### Multi-Layer Perceptrons (MLPs)
+Easily initialize MLPs with arbitrary input dimensions and hidden layers:
+```
+model = MLP(13, [20, 20, 1], hidden_activation='relu', output_activation='sigmoid')  # 13 inputs, 2 hidden layers of 20 neurons, 1 output. ReLU activation for hidden layers,                                                                                      # and sigmoid activation for the output layer
+```
+Access parameters of neurons, layers, or the entire model:
+```
+neuron = Neuron(2)
+neuron.parameters()  # returns [w1, w2, bias] as Scalars
+```
 
-- Engine.py contains a train_mlp function (As well as the Neuron, Layer, and MLP classes), which accepts the following inputs:
-  1. model: The model you wish to train (of type MLP)
-  2. Inputs: Must be a native python array, unfortunately it doesn't support numpy arrays (yet)
-  3. Outputs: Same condition as inputs
-  4. Batching Size (__NEW__): You can batch your training data together, and weights will only update per batch as opposed to per sample.
-  5. Epochs: The number of times you want to adjust the weights.
-  6. Learning rate: The factor by which the weights are changed per epoch.
-  - train_mlp currently only supports binary cross entropy for loss functions, I'll add more as soon as I fix example.py, which currently sucks at learning unfortunately (any help would be appreciated!)
+#### Activation Functions
+Currently supports `ReLU`, `Sigmoid`, `Tanh`
 
-Thanks for taking a look at my project! 
+#### Training (`engine.py`)
+- `train_mlp()` supports batch training with Python-native array inputs
+- Adjustable batch size, epochs, learning rate, and learning rate decay
+- Learning rate decay can be exponential, step-wise, cosine annealing, or linear
+- Currently supports mean squared error loss
+
+Example:
+```
+train_mlp(
+    model, x_train, y_train,
+    batch_size=32,
+    epochs=100,
+    learning_rate=0.01,
+    loss_fn=mean_squared_error,
+    lr_decay_type='exponential',
+    lr_decay_rate=0.90,
+    lr_decay_step=10,
+    lr_min=1e-6
+)
+```
+### Notes
+- Inputs and outputs must be Python arrays; NumPy arrays are not yet supported.
+- Only scalar operations are supported; no vectorized operations.
+
+### Testing
+- View the jupyter notebook for an example using the classic heart disease dataset. Scalarflow achieved an accuracy of 79%. Using pretty much the same implementation with Pytorch also yielded an 79% accuracy (Although binary cross entropy was used instead of mean squared error).
+
+
+Thanks for checking out ScalarFlow! Contributions and suggestions are welcome.
